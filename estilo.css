@@ -1,0 +1,31 @@
+body{
+ font-family: Verdana, Geneva, Arial, sans-serif;
+ font-size: small;
+ width: 800px;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+table {
+ margin-left: auto;
+ margin-right: auto;
+ margin-bottom: 30px;
+ width: 700px;
+ border: thin solid black;
+ caption-side: bottom;
+ border-collapse: collapse;
+}
+
+td, th {
+ border: thin dotted gray;
+ padding: 5px;
+ text-align: center;
+}
+
+.inp_num {
+	width:70px;
+}
+
+.botao{
+	margin-top: 15px;
+}

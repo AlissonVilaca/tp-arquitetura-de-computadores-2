@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<script src="ajax5.js"></script>
+	<script>
+		function init() {
+			var valor = document.getElementById("numero").value;
+			window.localStorage.setItem("quantidade", valor);
+			window.location = "page2.html";
+		}		
+	</script>
+
+</head>
+<body>
+	<input id="numero" type="text">
+	<input type="button" id="botao" onClick="init();" value="proximo">
+</body>
+</hmtl>

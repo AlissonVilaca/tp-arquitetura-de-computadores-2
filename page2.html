@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<link type="text/css" rel="stylesheet" href="estilo.css" />
+	<script src="ajax5.js"></script>
+	<script>
+		window.onload = montaTabela;
+
+		function montaTabela() {
+			var out = "";
+			var quantidade = parseInt(window.localStorage.getItem("quantidade"));		
+			var i;
+			out += "<table id=\"instrucoes\">";
+			for(i=0; i < quantidade; i++){
+				out += "<tr>";
+				out += "<td> <select id=\"t"+i+"\"><option>BEQ</option><option>ADDD</option> <option>MULTD</option> </select></td>";
+				out += "<td> <select id=\"r"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
+				out += "<td> <select id=\"s"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
+				out += "<td> <select id=\"d"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
+				out += "</tr>";			
+			}
+			out += "</table>";	
+			document.getElementById("teste").innerHTML = out;
+		}
+
+		function tomasulo() {
+
+		}	
+
+		function voltar() {
+			window.location = "index.html";
+		}
+		
+	</script>
+
+</head>
+<body>
+	<div id="teste">
+	</div>
+
+	<div>
+		Tempo de execução por estagio: 
+		<label>Load</label>
+		<input class="inp_num" id="qtd_load" type="text">
+		<label>Store</label>
+		<input class="inp_num" id="qtd_store" type="text">
+		<label>Add/Sub</label>
+		<input class="inp_num" id="qtd_add" type="text">
+		<label>Mult</label>
+		<input class="inp_num" id="qtd_mult" type="text">
+		<label>Div</label>
+		<input class="inp_num" id="qtd_div" type="text">
+
+	<div>
+	<input class="botao" style="float:right"type="button" value="Executar Tomasulo" onClick="tomasulo();">
+	<input class="botao" type="button" value="Voltar" onClick="voltar();"> 
+
+</body>
+<html>
