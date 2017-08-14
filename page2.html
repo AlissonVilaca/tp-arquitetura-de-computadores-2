@@ -6,26 +6,61 @@
 	<script src="ajax5.js"></script>
 	<script>
 		window.onload = montaTabela;
-
+		var quantidade = parseInt(window.localStorage.getItem("quantidade"));
+		window.localStorage.setItem("quantidade", quantidade);		
 		function montaTabela() {
 			var out = "";
-			var quantidade = parseInt(window.localStorage.getItem("quantidade"));		
 			var i;
 			out += "<table id=\"instrucoes\">";
 			for(i=0; i < quantidade; i++){
 				out += "<tr>";
-				out += "<td> <select id=\"t"+i+"\"><option>BEQ</option><option>ADDD</option> <option>MULTD</option> </select></td>";
-				out += "<td> <select id=\"r"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
-				out += "<td> <select id=\"s"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
-				out += "<td> <select id=\"d"+i+"\"><option>F1</option><option>F2</option> <option>F3</option> </select></td>";
+				out += "<td> <select id=\"t"+i+"\"><option>BEQ</option><option>ADD.D</option> <option>MULTD</option><option>SUBD</option><option>DIV.D</option><option>L.D</option><option>S.D</option><option>ADD</option><option>DADDUI</option><option>BNEZ</option> </select></td>";
+				out += "<td> <select id=\"r"+i+"\">";
+				for(var k = 0; k < 31; k += 2) {
+					out += "<option>F"+k+"</option>";
+				}
+				out += " </select></td>";
+				out += "<td> <select id=\"s"+i+"\">";
+				for(var k = 0; k < 31; k += 2) {
+					out += "<option>F"+k+"</option>";
+				}
+				out += " </select></td>";
+				out += "<td> <select id=\"d"+i+"\">";
+				for(var k = 0; k < 31; k += 2) {
+					out += "<option>F"+k+"</option>";
+				}
+				out += " </select></td>";
 				out += "</tr>";			
 			}
 			out += "</table>";	
 			document.getElementById("teste").innerHTML = out;
 		}
+		function sendTabelaDados() {
+			for(var i = 0; i < quantidade; i++) {
+				auxI = document.getElementById("t"+i);
+				auxF1 = document.getElementById("r"+i);
+				auxF2 = document.getElementById("s"+i);
+				auxF3 = document.getElementById("d"+i);
+				qtLoad = document.getElementById("qtd_load").value;
+				qtStore = document.getElementById("qtd_store").value;
+				qtAdd = document.getElementById("qtd_add").value;
+				qtMult = document.getElementById("qtd_mult").value;
+				qtDiv = document.getElementById("qtd_div").value;
+				window.localStorage.setItem("instrucao"+i, auxI.options[auxI.selectedIndex].text);
+				window.localStorage.setItem("reg1"+i, auxF1.options[auxF1.selectedIndex].text);
+				window.localStorage.setItem("reg2"+i, auxF2.options[auxF2.selectedIndex].text);
+				window.localStorage.setItem("reg3"+i, auxF3.options[auxF3.selectedIndex].text);
+				window.localStorage.setItem("qtdLoad", qtLoad);
+				window.localStorage.setItem("qtdStore", qtStore);
+				window.localStorage.setItem("qtdAdd", qtAdd);
+				window.localStorage.setItem("qtdMult", qtMult);
+				window.localStorage.setItem("qtdDiv", qtDiv);
+			}
+		}
 
-		function tomasulo() {			
-			window.location = "tomasuloExec.html";
+		function tomasulo() {
+			sendTabelaDados();
+			window.location = "tomasulo_exec.html";
 		}	
 
 		function voltar() {
