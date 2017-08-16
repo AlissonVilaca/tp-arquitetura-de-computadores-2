@@ -37,15 +37,15 @@
 		}
 		function sendTabelaDados() {
 			for(var i = 0; i < quantidade; i++) {
-				auxI = document.getElementById("t"+i);
-				auxF1 = document.getElementById("r"+i);
-				auxF2 = document.getElementById("s"+i);
-				auxF3 = document.getElementById("d"+i);
-				qtLoad = document.getElementById("qtd_load").value;
-				qtStore = document.getElementById("qtd_store").value;
-				qtAdd = document.getElementById("qtd_add").value;
-				qtMult = document.getElementById("qtd_mult").value;
-				qtDiv = document.getElementById("qtd_div").value;
+				var auxI = document.getElementById("t"+i);
+				var auxF1 = document.getElementById("r"+i);
+				var auxF2 = document.getElementById("s"+i);
+				var auxF3 = document.getElementById("d"+i);
+				var qtLoad = document.getElementById("qtd_load").value;
+				var qtStore = document.getElementById("qtd_store").value;
+				var qtAdd = document.getElementById("qtd_add").value;
+				var qtMult = document.getElementById("qtd_mult").value;
+				var qtDiv = document.getElementById("qtd_div").value;
 				window.localStorage.setItem("instrucao"+i, auxI.options[auxI.selectedIndex].text);
 				window.localStorage.setItem("reg1"+i, auxF1.options[auxF1.selectedIndex].text);
 				window.localStorage.setItem("reg2"+i, auxF2.options[auxF2.selectedIndex].text);
