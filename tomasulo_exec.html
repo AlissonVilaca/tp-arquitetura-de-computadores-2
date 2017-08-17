@@ -2,12 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">
-	<style>
-	table, th, td {
-		border: 1px solid black;
-	}
-	</style>
-	<script src="ajax5.js"></script>
+	<!--<link type="text/css" rel="stylesheet" href="yui.css" />-->
+	<link type="text/css" rel="stylesheet" href="estilo.css" />
 	<script type="text/javascript" src="instrucao.js"></script>
 	<script type="text/javascript" src="LineModel1.js"></script>
 	<script type="text/javascript" src="LineModel2.js"></script>
@@ -18,149 +14,306 @@
 	<script type="text/javascript" src="Foto.js"></script>
 	<script type="text/javascript" src="tomasulo.js"></script>
 	<script>
-		window.onload = montaTabelas;
-		var teste = window.localStorage.getItem("instrucao0")
-		var quantidade = parseInt(window.localStorage.getItem("quantidade"));
-		function montaTabelas() {
-			montaTabelaInstr();
-			montaInstrStation();
+		window.onload = function(){
+			montaTabelas(parseInt(window.localStorage.getItem("quantidade")));// inicializa as tabelas
+			
+			//salva e ajusta o clock
+			window.localStorage.setItem("clock", 0);
+			document.getElementById("clockAtual").innerHTML = "0";
+			
+			init(); 
+		}
+		
+		function montaTabelas(quantidade) {
+			montaTabelaInstr(quantidade);
+			montaLantencias();
+			
+			montaInstrStation(quantidade);
+			
+			montaIntStation();
+			montaAddStation();
+			montaMultiStation();
+			
 			montaLoadU();
 			montaStoreU();
-			montaReservStation();
-			montaRegisterStation();
-			init();
-		}		
-		function montaTabelaInstr() {
-			var out = "";
+			
+			montaRegisterStation(quantidade);
+		}
+		
+		function montaTabelaInstr(quantidade) {
+			//monta a tabela
+			var out = "<table id=\"instrucoesTabela\">";
+			out += "<caption>Instruction Table</caption>";
 			var i;
-			out += "<table id=\"instrucoes\">";
-			for(i=0; i < quantidade; i++){
-				var id = i*4;
-				out += "<tr>";
-				out += "<td id=\""+id+"\"></td><td id=\""+(id+1)+"\"></td><td id=\""+(id+2)+"\"></td><td id=\""+(id+3)+"\"></td>";
-				out += "</tr>";
-			}
-			out += "</table>";	
-			document.getElementById("teste").innerHTML = out;
 			var id = 0;
-			for(i = 0; i < quantidade; i++) { 
-				document.getElementById(id).innerHTML = window.localStorage.getItem("instrucao"+i);
-				document.getElementById(id+1).innerHTML = window.localStorage.getItem("reg1"+i);
-				document.getElementById(id+2).innerHTML = window.localStorage.getItem("reg2"+i);
-				document.getElementById(id+3).innerHTML = window.localStorage.getItem("reg3"+i);
+			for(i=0; i < quantidade; i++){
+				out += "<tr>";
+				out += "<td id=\""+id+"\">"+window.localStorage.getItem("t"+i)+"</td><td id=\""+(id+1)+"\">"+window.localStorage.getItem("r"+i)+"</td><td id=\""+(id+2)+"\">"+window.localStorage.getItem("s"+i)+"</td><td id=\""+(id+3)+"\">"+window.localStorage.getItem("d"+i)+"</td>";
+				out += "</tr>";
 				id += 4;
 			}
-			document.getElementById("qL").innerHTML = window.localStorage.getItem("qtdLoad");
-			document.getElementById("qS").innerHTML = window.localStorage.getItem("qtdStore");
-			document.getElementById("qAS").innerHTML = window.localStorage.getItem("qtdAdd");
-			document.getElementById("qM").innerHTML = window.localStorage.getItem("qtdMult");
-			document.getElementById("qD").innerHTML = window.localStorage.getItem("qtdDiv");
-				
+			out += "</table>";	
+			document.getElementById("instrucoesTabela").innerHTML = out;
 		}
-		function montaInstrStation() {
-			var out = "";
-			var i;
-			out += "<table id=\"instrStation\">";
+		
+		function montaLantencias(){
+			//inicializo a tabela
+			document.getElementById("latencias").innerHTML = "<table id=latenciass><caption>Latencias</caption><tr><th>Load</th><th>Store</th><th>Add/Sub</th><th>Mult</th><th>Div</th><th>Int</th></tr><tr><td id=\"qL\">"+window.localStorage.getItem("qtdLoad")+"</td><td id=\"qS\">"+window.localStorage.getItem("qtdStore")+"</td><td id=\"qAS\">"+window.localStorage.getItem("qtdAdd")+"</td><td id=\"qM\">"+window.localStorage.getItem("qtdMult")+"</td><td id=\"qD\">"+window.localStorage.getItem("qtdDiv")+"</td><td id=\"qI\">"+window.localStorage.getItem("qtdInt")+"</td></tr></table>";
+		}
+		
+		function montaInstrStation(quantidade) {
+			var out = "<table id=\"instrStation\">";
+			out += "<caption>Instruction Station</caption>";
 			out += "<tr><th>Issue</th><th>Exec comp</th><th>Write Result</th></tr>";
-			for(i = 0; i < quantidade; i++) {
-				out += "<tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < quantidade; i++) {
+				out += "<tr id=\"Ins"+i+"\">";
 				out += "<td></td><td></td><td></td>";
 				out += "</tr>";
 			}
 			out += "</table>";
 			document.getElementById("instructionStation").innerHTML = out;
 		}
+		
+		function montaIntStation(){
+			var out = "<table id=\"intStation\">";
+			out += "<caption>Int Station</caption>";
+			out += "<tr><th>Busy</th><th>Op</th><th>Vj</th><th>Vk</th><th>Qj</th><th>Qk</th></tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < 3; i++) {
+				out += "<tr id=\"Int"+i+"\">";
+				out += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+				out += "</tr>";
+			}
+			out += "</table>";
+			document.getElementById("intStation").innerHTML = out;
+		}
+		
+		function montaAddStation(){
+			var out = "<table id=\"addStation\">";
+			out += "<caption>Add Station</caption>";
+			out += "<tr><th>Busy</th><th>Op</th><th>Vj</th><th>Vk</th><th>Qj</th><th>Qk</th></tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < 3; i++) {
+				out += "<tr id=\"Add"+i+"\">";
+				out += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+				out += "</tr>";
+			}
+			out += "</table>";
+			document.getElementById("addStation").innerHTML = out;
+		}
+		
+		function montaMultiStation(){
+			var out = "<table id=\"multiStation\">";
+			out += "<caption>Mult Station</caption>";
+			out += "<tr><th>Busy</th><th>Op</th><th>Vj</th><th>Vk</th><th>Qj</th><th>Qk</th></tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < 2; i++) {
+				out += "<tr id=\"Mul"+i+"\">";
+				out += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+				out += "</tr>";
+			}
+			out += "</table>";
+			document.getElementById("multiStation").innerHTML = out;
+		}
+		
 		function montaLoadU() {
-			var out = "";
-			var i;
-			out += "<table id=\"loadStation\">";
-			out += "<tr><th>Name</th><th>Busy</th><th>Address</th><th>Funct Unit</th></tr>";
-			for(i = 0; i < quantidade; i++) {
-				out += "<tr>";
-				out += "<td></td><td></td><td></td><td></td>";
+			var out = "<table id=\"loadStation\">";
+			out += "<caption>Load Station</caption>";
+			out += "<tr><th>Busy</th><th>Address</th></tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < 6; i++) {
+				out += "<tr id=\"Load"+i+"\">";
+				out += "<td></td><td></td>";
 				out += "</tr>";
 			}
 			out += "</table>";
 			document.getElementById("loadStation").innerHTML = out;
 		}
+		
 		function montaStoreU() {
-			var out = "";
-			var i;
-			out += "<table id=\"storeStation\">";
-			out += "<tr><th>Name</th><th>Busy</th><th>Address</th><th>FunctUnit</th></tr>";
-			for(i = 0; i < quantidade; i++) {
-				out += "<tr>";
+			var out = "<table id=\"storeStation\">";
+			out += "<caption>Store Station</caption>";
+			out += "<tr><th>Busy</th><th>Vj</th><th>Qj</th><th>Address</th></tr>";
+			//inicializa a tabela vazia
+			for(var i = 0; i < 3; i++) {
+				out += "<tr id=\"Store"+i+"\">";
 				out += "<td></td><td></td><td></td><td></td>";
 				out += "</tr>";
 			}
 			out += "</table>";
 			document.getElementById("storeStation").innerHTML = out;
 		}
-		function montaReservStation() {
-			var out = "";
-			var i;
-			out += "<table id=\"reservStation\">";
-			out += "<tr><th>Name</th><th>Busy</th><th>Op</th><th>Vj</th><th>Vk</th><th>Qj</th><th>Qk</th><th>time</th></tr>";
-			for(i = 0; i < quantidade; i++) {
-				out += "<tr>";
-				out += "<td></td><td></td><td></td>";
-				out += "</tr>";
-			}
-			out += "</table>";
-			document.getElementById("reservStation").innerHTML = out;
-		}	
-		function montaRegisterStation() {
-			var out = "";
-			var i;
-			out += "<table id=\"registerStation\">";
+		
+		function montaRegisterStation(quantidade) {
+			var out = "<table id=\"registerStation\">";
+			out += "<caption>Reg Station</caption>";
 			out += "<tr>";
-			for(i = 0; i < 31; i += 2) {
-				out += "<th>F"+i+"</th>";
+			//inicializa a tabela vazia
+			var v = [32]
+			for(var k = 0; k < 16; k += 1) {
+				v[k] = "F"+(k+k);
+				v[k+16] = "R"+k;
+			}
+			
+			var i;
+			for(i = 0; i < 32; i += 1) {
+				out += "<th>"+v[i]+"</th>";
 			}
 			out += "</tr>";
 			out += "<tr>";
-			for(i = 0; i < 31; i += 2) {
-				out += "<td></td>";
+			for(i = 0; i < 32; i += 1) {
+				out += "<td id=\"Reg"+i+"\"></td>";
 			}
 			out += "</tr>";
 			out += "</table>";
 			document.getElementById("regStation").innerHTML = out;
 		}
+		
+		
+		
+		
+		
+		function attTabelas(foto){
+			var i;
+			//instructionStatus
+			var out = "<table id=\"instrStation\">";
+			out += "<caption>Instruction Table</caption>";
+			out += "<tr><th>Issue</th><th>Exec comp</th><th>Write Result</th></tr>";
+			//atualizo a tabela
+			for(var i = 0; i < parseInt(window.localStorage.getItem("quantidade")); i++) {
+				out += "<tr id=\"Ins"+i+"\">";
+				for(var j = 0;j < 3;j++){
+					if(foto.instructionStatus.matrizStatus[i][j] == 0){
+						out += "<td></td>";
+					}
+					else{
+						out += "<td>"+foto.instructionStatus.matrizStatus[i][j]+"</td>";
+					}
+				}
+				out += "</tr>";
+			}
+			out += "</table>";
+			document.getElementById("instructionStation").innerHTML = out;
+			
+			//reservationStation
+			//intStation
+			for(i = 0;i < 3;i++){
+				if(foto.reservationStation.integer[i]){
+					document.getElementById("Int"+i).innerHTML = "<td>"+foto.reservationStation.integer[i].busy+"</td><td>"+foto.reservationStation.integer[i].op+"</td><td>"+foto.reservationStation.integer[i].vj+"</td><td>"+foto.reservationStation.integer[i].vk+"</td><td>"+foto.reservationStation.integer[i].qj+"</td><td>"+foto.reservationStation.integer[i].qk+"</td>";
+				}
+			}
+			
+			//addStation
+			for(i = 0;i < 3;i++){
+				if(foto.reservationStation.adds[i]){
+					document.getElementById("Add"+i).innerHTML = "<td>"+foto.reservationStation.adds[i].busy+"</td><td>"+foto.reservationStation.adds[i].op+"</td><td>"+foto.reservationStation.adds[i].vj+"</td><td>"+foto.reservationStation.adds[i].vk+"</td><td>"+foto.reservationStation.adds[i].qj+"</td><td>"+foto.reservationStation.adds[i].qk+"</td>";
+				}
+			}
+			
+			//multiStation
+			for(i = 0;i < 2;i++){
+				if(foto.reservationStation.mult[i]){
+					document.getElementById("Mul"+i).innerHTML = "<td>"+foto.reservationStation.mult[i].busy+"</td><td>"+foto.reservationStation.mult[i].op+"</td><td>"+foto.reservationStation.mult[i].vj+"</td><td>"+foto.reservationStation.mult[i].vk+"</td><td>"+foto.reservationStation.mult[i].qj+"</td><td>"+foto.reservationStation.mult[i].qk+"</td>";
+				}
+			}
+			
+			//loadStation
+			for(i = 0;i < 6;i++){
+				if(foto.reservationStation.load[i]){
+					document.getElementById("Load"+i).innerHTML = "<td>"+foto.reservationStation.load[i].busy+"</td><td>"+foto.reservationStation.load[i].address+"</td>";
+				}
+			}
+			
+			//storeStation
+			for(i = 0;i < 3;i++){
+				if(foto.reservationStation.store[i]){
+					document.getElementById("Store"+i).innerHTML = "<td>"+foto.reservationStation.store[i].busy+"</td><td>"+foto.reservationStation.store[i].vj+"</td><td>"+foto.reservationStation.store[i].qj+"</td><td>"+foto.reservationStation.store[i].address+"</td>";
+				}
+			}
+			
+			//registerFile
+			for(i = 0;i < 32;i++){
+				if(foto.registerFile.apelido[i] != ""){
+					document.getElementById("Reg"+i).innerHTML = foto.registerFile.apelido[i];
+				}
+			}
+		}
+		
+		
+		
+		
+		function antClock() {
+			var clock = parseInt(window.localStorage.getItem("clock"));
+			if(clock-1 >= 0) {
+				clock -= 1;
+				var attFoto = JSON.parse(window.localStorage.getItem("listaFotos"));
+				attTabelas(attFoto[clock]);
+			}
+			attClock(clock);
+		}
+		
+		function proxClock() {
+			var clock = parseInt(window.localStorage.getItem("clock"));
+			clock += 1;
+			var attFoto = JSON.parse(window.localStorage.getItem("listaFotos"));
+			attTabelas(attFoto[clock]);
+			attClock(clock);
+		}
+		
+		function attClock(clock) {
+			window.localStorage.setItem("clock", clock);
+			document.getElementById("clockAtual").innerHTML = clock;
+		}
+		
+		function inicioExe() {
+			var clock = 0;
+			attClock(clock);
+			var attFoto = JSON.parse(window.localStorage.getItem("listaFotos"));
+			attTabelas(attFoto[clock]);
+		}
+		
+		function fimExe() {
+			var attFoto = JSON.parse(window.localStorage.getItem("listaFotos"));
+			var clock = attFoto.length-1;
+			attClock(clock);
+			attTabelas(attFoto[clock]);
+		}
+		
 	</script>
 </head>
 <body>
-	<div id="teste">
-	</div>
-	<div>
-		<table>
-		<tr>
-			<th>Load</th>	
-			<th>Store</th>
-			<th>Add/Sub</th>
-			<th>Mult</th>
-			<th>Div</th>
-		</tr>
-		<tr>
-			<td id="qL"></td>
-			<td id="qS"></td>
-			<td id="qAS"></td>
-			<td id="qM"></td>
-			<td id="qD"></td>
-		</tr>
-		</table>
-	</div>
+	<div id="tudo">
 	<div id="instructionStation">
+	</div>
+	<div id="parte1">
+		<div id="instrucoesTabela">
+		</div>
+		<div id = "latencias">
+		</div>
+		<div id = "clock">
+			<br/>Clock atual: <span id="clockAtual">0</span><br/>
+		</div>
+	</div>
+	<div id = "parte2">
+	<div id="intStation">
+	</div>
+	<div id="addStation">
+	</div>
 	</div>
 	<div id="loadStation">
 	</div>
-	<div id="storeStation">
+	<div id="multiStation">
 	</div>
-	<div id="reservStation">
+	<div id="storeStation">
 	</div>
 	<div id="regStation">
 	</div>
-	<input type="button" id="prev" onClick="prev();" value="voltar">
-	<input type="button" id="prox" onClick="update();" value="proximo">
+	</div>
+	<input type="button" id="init" class="botao" onClick="inicioExe();" value="Início">
+	<input type="button" id="prev" class="botao" onClick="antClock();" value="Ciclo Anterior">
+	<input type="button" id="prox" class="botao" onClick="proxClock();" value="Ciclo Posterior">
+	<input type="button" id="end" class="botao" onClick="fimExe();" value="Fim">
 </body>
 </html>
 

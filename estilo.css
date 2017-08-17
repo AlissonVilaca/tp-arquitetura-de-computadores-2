@@ -1,31 +1,117 @@
+
 body{
+ background-color: #90EE90;
  font-family: Verdana, Geneva, Arial, sans-serif;
  font-size: small;
- width: 800px;
  margin-left: auto;
  margin-right: auto;
+}
+
+#entrada{
+ text-align: center;
+ padding: 200px;
+ font-family: Verdana, Geneva, Arial, sans-serif;
+ font-size: small;
+ height: auto;
+ margin-left: auto;
+ margin-right: auto;
+}
+#instrucoesTabela{
+ width: 40%;
+ margin-left: 0px;
+ float: bottom;
+}
+#instrStation{
+ float: center;
+}
+
+#intStation{
+ float: right;
+}
+
+#addStation{
+ float: right;
+ margin-left: 40px;
+}
+
+#multiStation{
+ float: left;
+ margin-left: 40px;
+}
+
+#loadStation{
+ float: right;
+}
+
+#storeStation{
+ float: left;
+}
+
+#registerStation{
+}
+
+#latenciass{
+ width: 30%;
+}
+
+#parte1{
+ float: left;
+ white-space: nowrap;
+}
+
+#parte2{
+ float: left;
+ display:block;
+}
+
+#clock{
+ border-style: solid;
+ border-color: #555555;
+ font-size: 16px;
+ color: white;
+ background-color: #555555;
+ width: 40%;
+ 
+ text-align: center;
+}
+
+caption{
+ color: white;
+ background-color: #555555;
 }
 
 table {
  margin-left: auto;
  margin-right: auto;
  margin-bottom: 30px;
- width: 700px;
- border: thin solid black;
+ width: 300px;
+ border: thin solid #555555;
+ border-width: 4px;
  caption-side: bottom;
  border-collapse: collapse;
 }
 
 td, th {
- border: thin dotted gray;
+ border: thin solid #555555 ;
  padding: 5px;
  text-align: center;
 }
-
+br{
+ text-align: right;
+}
 .inp_num {
 	width:70px;
 }
 
 .botao{
-	margin-top: 15px;
+	background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
 }

@@ -12,6 +12,10 @@ var RegisterFile = function(){
 		this.registerSolved[i] = true;
 		this.registerSolved[i+16] = true;
 		this.registerSolved[i+32] = true;
+		
+		this.apelido[i] = "";
+		this.apelido[i+16] = "";
+		this.apelido[i+32] = "";
 	}
 
 	this.acharPosicao = function(nome1){

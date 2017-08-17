@@ -2,76 +2,134 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">
+	<!--<link type="text/css" rel="stylesheet" href="yui.css" />-->
 	<link type="text/css" rel="stylesheet" href="estilo.css" />
-	<script src="ajax5.js"></script>
 	<script>
-		window.onload = montaTabela;
-		var quantidade = parseInt(window.localStorage.getItem("quantidade"));
-		window.localStorage.setItem("quantidade", quantidade);		
-		function montaTabela() {
-			var out = "";
-			var i;
-			out += "<table id=\"instrucoes\">";
-			for(i=0; i < quantidade; i++){
+		window.onload = function() {
+			//persisto o dado no LocalStorage
+			var quantidade = parseInt(window.localStorage.getItem("quantidade"));
+			window.localStorage.setItem("quantidade", quantidade);	
+			
+			//monta a tabela com os campos para as intrucoes e seus registradores serem selecionados
+			montarTabela(quantidade);
+		}
+		
+		function montarTabela(quantidade){
+			var out = "<table id=\"instrucoes\">";
+			for(var i=0; i < quantidade; i++){
+				var k;
+				
+				//aux para diminuir o processamento
+				var aux = "";
+				for(k = 0; k < 16; k += 1) {
+					aux += "<option>"+"F"+(k+k)+"</option>";
+				}
+				
+				//criacao do codio da tabela
 				out += "<tr>";
-				out += "<td> <select id=\"t"+i+"\"><option>BEQ</option><option>ADD.D</option> <option>MULTD</option><option>SUBD</option><option>DIV.D</option><option>L.D</option><option>S.D</option><option>ADD</option><option>DADDUI</option><option>BNEZ</option> </select></td>";
+				
+				//instrucao
+				out += "<td> <select id=\"t"+i+"\" onchange=\"ajustaDropDown("+i+")\"><option value=\"ADD.D\">ADD.D</option><option value=\"BEQ\">BEQ</option> <option value=\"MULTD\">MULTD</option><option value=\"SUBD\">SUBD</option><option value=\"DIV.D\">DIV.D</option><option value=\"L.D\">L.D</option><option value=\"S.D\">S.D</option><option value=\"ADD\">ADD</option><option value=\"DADDUI\">DADDUI</option><option value=\"BNEZ\">BNEZ</option> </select></td>";
+				
+				//reg r
 				out += "<td> <select id=\"r"+i+"\">";
-				for(var k = 0; k < 31; k += 2) {
-					out += "<option>F"+k+"</option>";
-				}
+				out += aux
 				out += " </select></td>";
+				
+				//reg s
 				out += "<td> <select id=\"s"+i+"\">";
-				for(var k = 0; k < 31; k += 2) {
-					out += "<option>F"+k+"</option>";
-				}
+				out += aux
 				out += " </select></td>";
+				
+				//reg d
 				out += "<td> <select id=\"d"+i+"\">";
-				for(var k = 0; k < 31; k += 2) {
-					out += "<option>F"+k+"</option>";
-				}
+				out += aux
 				out += " </select></td>";
+				
 				out += "</tr>";			
 			}
-			out += "</table>";	
-			document.getElementById("teste").innerHTML = out;
+			out += "</table>";
+			//insercao da tabela no codigo
+			document.getElementById("tabela").innerHTML = out;
 		}
-		function sendTabelaDados() {
-			for(var i = 0; i < quantidade; i++) {
-				var auxI = document.getElementById("t"+i);
-				var auxF1 = document.getElementById("r"+i);
-				var auxF2 = document.getElementById("s"+i);
-				var auxF3 = document.getElementById("d"+i);
-				var qtLoad = document.getElementById("qtd_load").value;
-				var qtStore = document.getElementById("qtd_store").value;
-				var qtAdd = document.getElementById("qtd_add").value;
-				var qtMult = document.getElementById("qtd_mult").value;
-				var qtDiv = document.getElementById("qtd_div").value;
-				window.localStorage.setItem("instrucao"+i, auxI.options[auxI.selectedIndex].text);
-				window.localStorage.setItem("reg1"+i, auxF1.options[auxF1.selectedIndex].text);
-				window.localStorage.setItem("reg2"+i, auxF2.options[auxF2.selectedIndex].text);
-				window.localStorage.setItem("reg3"+i, auxF3.options[auxF3.selectedIndex].text);
-				window.localStorage.setItem("qtdLoad", qtLoad);
-				window.localStorage.setItem("qtdStore", qtStore);
-				window.localStorage.setItem("qtdAdd", qtAdd);
-				window.localStorage.setItem("qtdMult", qtMult);
-				window.localStorage.setItem("qtdDiv", qtDiv);
+		
+		//funcao que garante que apenas operadores validos de uma instrucao sejam selecionados
+		function ajustaDropDown(i){
+			var tx = document.getElementById("t"+i);
+			var valor = tx.options[tx.selectedIndex].getAttribute('value'); //valor selecionado
+			
+			var out0 = "";
+			var out1 = "";
+			var out2 = "";
+			if(valor == "BEQ" || valor == "BNEZ"){
+				for(var j = 0; j < 16; j += 1) {
+					out0 += "<option>R"+j+"</option>";
+				}
+				out1 = out0;
+				out2 = "<option>LOOP</option>";
+			}else if(valor == "L.D" || valor == "S.D"){
+				for(var j = 0; j < 16; j += 1) {
+					out0 += "<option>F"+(j+j)+"</option>";
+				}
+				out1 = "<option>NUMERO</option>";
+				for(var j = 0; j < 16; j += 1) {
+					out2 += "<option>R"+j+"</option>";
+				}
+			}else if(valor == "ADD"){
+				for(var j = 0; j < 16; j += 1) {
+					out0 += "<option>R"+j+"</option>";
+				}
+				out1 = out0;
+				out2 = out0;
+			}else{
+				for(var j = 0; j < 16; j += 1) {
+					out0 += "<option>F"+(j+j)+"</option>";
+				}
+				out1 = out0;
+				out2 = out0;
 			}
+			
+			document.getElementById("r"+i).innerHTML = out0;
+			document.getElementById("s"+i).innerHTML = out1;
+			document.getElementById("d"+i).innerHTML = out2;
+		}
+		
+		
+		
+		
+		function salvaTabelaDados() {
+			//salva as intrucoes e seus operandos no localStorage
+			for(var i = 0; i < parseInt(window.localStorage.getItem("quantidade")); i++) {
+				var auxT = document.getElementById("t"+i);
+				var auxR = document.getElementById("r"+i);
+				var auxS = document.getElementById("s"+i);
+				var auxD = document.getElementById("d"+i);
+				
+				window.localStorage.setItem("t"+i, auxT.options[auxT.selectedIndex].text);
+				window.localStorage.setItem("r"+i, auxR.options[auxR.selectedIndex].text);
+				window.localStorage.setItem("s"+i, auxS.options[auxS.selectedIndex].text);
+				window.localStorage.setItem("d"+i, auxD.options[auxD.selectedIndex].text);
+			}
+			
+			//salva as latencias no localStorage
+			window.localStorage.setItem("qtdLoad", document.getElementById("qtd_load").value);
+			window.localStorage.setItem("qtdStore", document.getElementById("qtd_store").value);
+			window.localStorage.setItem("qtdAdd", document.getElementById("qtd_add").value);
+			window.localStorage.setItem("qtdMult", document.getElementById("qtd_mult").value);
+			window.localStorage.setItem("qtdDiv", document.getElementById("qtd_div").value);
+			window.localStorage.setItem("qtdInt", document.getElementById("qtd_int").value);
 		}
 
 		function tomasulo() {
-			sendTabelaDados();
+			salvaTabelaDados();
 			window.location = "tomasulo_exec.html";
-		}	
-
-		function voltar() {
-			window.location = "index.html";
 		}
 		
 	</script>
 
 </head>
 <body>
-	<div id="teste">
+	<div id="tabela">
 	</div>
 
 	<div>
@@ -86,10 +144,11 @@
 		<input class="inp_num" id="qtd_mult" type="text">
 		<label>Div</label>
 		<input class="inp_num" id="qtd_div" type="text">
+		<label>Int</label>
+		<input class="inp_num" id="qtd_int" type="text">
 
-	<div>
+	</div>
 	<input class="botao" style="float:right"type="button" value="Executar Tomasulo" onClick="tomasulo();">
-	<input class="botao" type="button" value="Voltar" onClick="voltar();"> 
 
 </body>
 <html>

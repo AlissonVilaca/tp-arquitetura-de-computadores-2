@@ -4,5 +4,6 @@ var Instrucao = function (nome,op0,op1,op2,latencia) {
 	this.op1 = op1;
 	this.op2 = op2;
 	this.latencia = latencia;
-	this.posicaoUnidade = -1;	
+	this.posicaoUnidade = -1;
+	this.despachou = false;	
 };

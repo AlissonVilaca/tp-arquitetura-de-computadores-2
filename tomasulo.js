@@ -1,21 +1,21 @@
+//TESTADA
 function init(){	
 	var listaInstrucoes  = carregarDados();	
 	var listadeFotos = [];
 	resolverTomasulo(listaInstrucoes,listadeFotos);
 
 }
-
+//TESTADA
 function carregarDados(){
 	var listaInstrucoes = [];
 	//criar lista de instruções Rafael, ja colocando a latencia junto com as instruções;		
 	var quantidade = parseInt(window.localStorage.getItem("quantidade"));
-
-	var id = 0;
+	
 	for(var i = 0; i < quantidade; i++) { 
-		var nome = window.localStorage.getItem("instrucao"+i);		
-		var op0 = window.localStorage.getItem("reg1"+i);
-		var op1 = window.localStorage.getItem("reg2"+i);
-		var op2 = window.localStorage.getItem("reg3"+i);
+		var nome = window.localStorage.getItem("t"+i);		
+		var op0 = window.localStorage.getItem("r"+i);
+		var op1 = window.localStorage.getItem("s"+i);
+		var op2 = window.localStorage.getItem("d"+i);
 		var l = 0;
 		if(nome == "ADD.D" || nome == "SUBD" || nome == "DADDUI"){
 			l = parseInt(window.localStorage.getItem("qtdAdd"));
@@ -33,25 +33,22 @@ function carregarDados(){
 			l = parseInt(window.localStorage.getItem("qtdStore"));
 		}
 		else{
-			//TODO - LER A DURACAO DE INTEIROS (RAFAEL)
-			l = 1;
+			l = parseInt(window.localStorage.getItem("qtdInt"));
 		}			 					 					 		
 
-		listaInstrucoes.push(new Instrucao(nome,op0,op1,op2,l));				
-		id += 4;
+		listaInstrucoes.push(new Instrucao(nome,op0,op1,op2,l));		
 	}									
 	return listaInstrucoes;
 }
 
 function resolverTomasulo(listaInstrucoes,listadeFotos){		
 	//incializar dados
-	var listaInstrucoesPronta = [listaInstrucoes.length];
-	var fimExecucao = [listaInstrucoes.length];
-	for(var i = 0; i < listaInstrucoesPronta.length; i++){
+	var listaInstrucoesPronta = [];	
+	var fimExecucao = [];
+	for(var i = 0; i < listaInstrucoes.length; i++){
 		listaInstrucoesPronta[i] = false;		
 		fimExecucao[i] = -1;
-	}
-
+	}	
 	var pc = 0;
 	var clock = 1;
 	
@@ -61,37 +58,47 @@ function resolverTomasulo(listaInstrucoes,listadeFotos){
 	var contGlobal = {value:0};						
 
 	//criando foto 0
-	listadeFotos.push(new Foto(instructionStatus,reservationStation,registerFile,0));
+	var instructionStatusCopy = JSON.parse(JSON.stringify(instructionStatus));
+	var reservationStationCopy = JSON.parse(JSON.stringify(reservationStation));
+	var registerFileCopy = JSON.parse(JSON.stringify(registerFile));
+	listadeFotos.push(new Foto(instructionStatusCopy,reservationStationCopy,registerFileCopy,0));
 	//resolver algoritmo	
 	//milestone	
 	while(!resolveuTudo(listaInstrucoesPronta)){
-		//despachar a instrução	se existe instrucao com este pc			
+		//despachar a instrução	se existe instrucao com este pc	
+		var despachou = false;		
 		if(pc < listaInstrucoes.length){
-			var despachou = despachar(pc,listaInstrucoes[pc],clock,instructionStatus,reservationStation,registerFile,contGlobal);
-		}		
-
+			despachou = despachar(pc,listaInstrucoes[pc],clock,instructionStatus,reservationStation,registerFile,contGlobal);
+		}				
 		//Executar processamento nesse ciclo
 		atualizar(pc,listaInstrucoes,listaInstrucoesPronta,clock,instructionStatus,reservationStation,fimExecucao,registerFile,contGlobal);
 
 		//tirar foto já inserindo na lista de resolução
-		var foto = new Foto(instructionStatus,reservationStation,registerFile,clock);
-		listadeFotos.push(foto);
+		instructionStatusCopy = JSON.parse(JSON.stringify(instructionStatus));
+		reservationStationCopy = JSON.parse(JSON.stringify(reservationStation));
+		registerFileCopy = JSON.parse(JSON.stringify(registerFile));
+		var foto = new Foto(instructionStatusCopy,reservationStationCopy,registerFileCopy,clock);
+		listadeFotos.push(foto);				
 
 		//incrementar pc caso houve despacho
 		if(despachou){
 			pc++;
 		}
 		//incrementar o clock		
-		alert(clock);
 		clock++;				
 	}
+	window.localStorage.setItem("listaFotos",JSON.stringify(listadeFotos));
 }
-
+//atualizar
 function atualizar(pc,listaInstrucao,listaInstrucoesPronta,clock,instructionStatus,reservationStation,fimExecucao,registerFile,contGlobal){
+	var auxProntos = [];
+	for(var k = 0; k < listaInstrucao.length; k++){
+		auxProntos[k] = false;
+	}
 	//verificar se a instrucao i terminou
 	for(var i = 0; i < pc; i++){
 		if(!listaInstrucoesPronta[i]){
-			//não começou a executar
+			//não começou a executar						
 			if(fimExecucao[i] == -1){
 				//verificar porque não começou
 				var instrucao = listaInstrucao[i];				
@@ -101,9 +108,14 @@ function atualizar(pc,listaInstrucao,listaInstrucoesPronta,clock,instructionStat
 				var pos = instrucao.posicaoUnidade;
 				var podeExecutar = false;
 				if(nome != "Store" && nome != "Load"){
-					if(unidade[pos].vj != "" && unidade[pos].vk != ""){
-						podeExecutar = true;
+					if(instrucao.nome == "BNEZ"){
+						if(unidade[pos].vj != ""){
+							podeExecutar = true;	
+						}	
 					}
+					else if(unidade[pos].vj != "" && unidade[pos].vk != ""){
+						podeExecutar = true;										
+					}					
 				}	
 				else if(nome != "Load"){
 					if(unidade[pos].vj != ""){
@@ -119,27 +131,35 @@ function atualizar(pc,listaInstrucao,listaInstrucoesPronta,clock,instructionStat
 					fimExecucao[i] = clock-1+instrucao.latencia;
 				}
 			}
-			else if(fimExecucao[i] == clock){
+			if(fimExecucao[i] == clock){
 				//execution complete
 				instructionStatus.matrizStatus[i][1] = clock;
 
 			}
 			else if(fimExecucao[i]+1 == clock){
 				//escrever resultado
-				instructionStatus.matrizStatus[i][2] = clock;
-				var instrucao = listaInstrucao[i];
+				instructionStatus.matrizStatus[i][2] = clock;				
+				auxProntos[i] = true;							
+			} 			
+		}
+	}
+
+	//limpar as unidades
+	for(var k = 0; k < auxProntos.length; k++){
+		if(auxProntos[k] == true){			
+			var instrucao = listaInstrucao[k];						
+			if(instrucao.nome != "S.D" && instrucao.nome != "BEQ" && instrucao.nome != "BNEZ"){
 				var posicao = registerFile.acharPosicao(instrucao.op0);
 				atualizaReservationStation(registerFile.apelido[posicao],reservationStation,contGlobal,instrucao);				
 				registerFile.apelido[posicao] = instrucao.op0+"_"+contGlobal.value;
-				contGlobal.value++;
-				listaInstrucoesPronta[i] = true;
-				limparUnidade(reservationStation,instrucao);
-			}		
-		}
-
+				contGlobal.value++;					
+			}				
+			listaInstrucoesPronta[k] = true;
+			limparUnidade(reservationStation,instrucao);			
+		}			
 	}
 }
-
+//TESTDA
 function limparUnidade(reservationStation,instrucao){
 	var linha;
 	var achou = false;
@@ -152,7 +172,7 @@ function limparUnidade(reservationStation,instrucao){
 		linha = reservationStation.mult[instrucao.posicaoUnidade];							
 		achou = true;
 	}
-	else if(instrucao.nome == "ADD"){
+	else if(instrucao.nome == "ADD" || instrucao.nome == "BEQ" || instrucao.nome == "BNEZ"){
 		linha = reservationStation.integer[instrucao.posicaoUnidade];							
 		achou = true;
 	}
@@ -172,14 +192,14 @@ function limparUnidade(reservationStation,instrucao){
 	}
 	//reseta linha model2
 	else if(instrucao.nome == "S.D"){
-		linha = reservationStation.load[instrucao.posicaoUnidade];
+		linha = reservationStation.store[instrucao.posicaoUnidade];
 		linha.address = "";
 		linha.qj = "";
 		linha.vj = "";
 		linha.busy = false;
 	}			
 }
-
+//TESTADA
 function atualizaReservationStation(apelido,reservationStation,contGlobal,instrucao){
 	var renomeamento = instrucao.op0+"_"+contGlobal.value;
 	for(var i = 0; i < reservationStation.adds.length; i++){
@@ -201,7 +221,7 @@ function atualizaReservationStation(apelido,reservationStation,contGlobal,instru
 			reservationStation.integer[i].vk = renomeamento;
 			reservationStation.integer[i].qk = "";
 		}
-		// renomeia instrucao na unidade de inteiros
+		// renomeia instrucao na unidade de store
 		if(reservationStation.store[i].qj == apelido){
 			reservationStation.store[i].vj = renomeamento;
 			reservationStation.store[i].qj = "";
@@ -218,46 +238,8 @@ function atualizaReservationStation(apelido,reservationStation,contGlobal,instru
 			reservationStation.mult[i].qk = "";
 		}
 	}	
-	/*
-	for(var linha in reservationStation.adds){
-		if(linha.qj == apelido){
-			linha.vj = instrucao.op0+"_"+contGlobal.value;
-			linha.qj = "";
-		}
-		if(linha.qk == apelido){
-			linha.vk = instrucao.op0+"_"+contGlobal.value;
-			linha.qk = "";
-		}
-	}
-	for(var linha in reservationStation.mult){
-		if(linha.qj == apelido){
-			linha.vj = instrucao.op0+"_"+contGlobal.value;
-			linha.qj = "";
-		}
-		if(linha.qk == apelido){
-			linha.vk = instrucao.op0+"_"+contGlobal.value;
-			linha.qk = "";
-		}
-	}
-	for(var linha in reservationStation.integer){
-		if(linha.qj == apelido){
-			linha.vj = instrucao.op0+"_"+contGlobal.value;
-			linha.qj = "";
-		}
-		if(linha.qk == apelido){
-			linha.vk = instrucao.op0+"_"+contGlobal.value;
-			linha.qk = "";
-		}
-	}			
-	for(var linha in reservationStation.store){
-		if(linha.qj == apelido){
-			linha.vj = instrucao.op0+"_"+contGlobal.value;
-			linha.qj = "";
-		}				
-	}
-	*/
 }
-
+//TESTADA
 function despachar(pc,instrucao,clock,instructionStatus,reservationStation,registerFile,contGlobal){
 	var unidadeEnome = acharUnidade(instrucao,reservationStation);
 	var unidade = unidadeEnome[0];
@@ -265,7 +247,6 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 
 	var i = 0;
 	var linhaDisponivel = false;
-	alert(unidade.length+" despacho")
 	//verifico se a unidade está ocupada
 	for(i = 0; i < unidade.length; i++){
 		if(!unidade[i].busy){
@@ -276,44 +257,89 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 	if(linhaDisponivel){			
 		//informei qual linha da unidade se encontra a dada instrução
 		instrucao.posicaoUnidade = i;
-
-		//TODO - TRATAR O STORE AQUI POIS ELE NAO RENOMEIA REGISTRADOR PORQUE VAI CALCULAR ALGUMA COISA 
-		//ELE SÓ SALVA SE vj ESTIVER PRONTO. PORTANTO, NAO PRECISA COLOCAR REGISTER_SOLVED = FALSE; NEM ALTERAR O APELIDO
-		//DO REGISTRADOR;
 		var posicaoNoFU = registerFile.acharPosicao(instrucao.op0);
-		registerFile.registerSolved[posicaoNoFU] = false;
-		var x = i+1;
-		registerFile.apelido[posicaoNoFU] = nomeUnidade+x;
+		if(instrucao.nome != "S.D" && instrucao.nome != "BEQ" && instrucao.nome != "BNEZ"){
+			registerFile.registerSolved[posicaoNoFU] = false;
+			var x = i+1;
+			registerFile.apelido[posicaoNoFU] = nomeUnidade+x;
+		}				
 
 		//despachando para a unidade correta
 		unidade[i].busy = true;
 		if(nomeUnidade == "Add" || nomeUnidade == "Mult" || nomeUnidade == "Integer"){
-			unidade[i].op = instrucao.nome;
-			var j = registerFile.acharPosicao(instrucao.op1);
-			var k = registerFile.acharPosicao(instrucao.op2);
-			if(registerFile.registerSolved[j] == true){
-				if(registerFile.apelido[j] == ""){
-					unidade[i].vj = instrucao.op1+"_"+contGlobal.value;
-					contGlobal.value++;
+			if(instrucao.nome == "BEQ"){
+				unidade[i].op = instrucao.nome;
+				var j = registerFile.acharPosicao(instrucao.op0);
+				var k = registerFile.acharPosicao(instrucao.op1);
+				if(registerFile.registerSolved[j] == true){
+					if(registerFile.apelido[j] == ""){
+						unidade[i].vj = instrucao.op0+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vj = registerFile.apelido[j];
+					}						
 				}
 				else{
-					unidade[i].vj = registerFile.apelido[j];
-				}						
-			}
-			else{
-				unidade[i].qj = registerFile.apelido[j];
-			}
-			if(registerFile.registerSolved[k] == true){
-				if(registerFile.apelido[k] == ""){
-					unidade[i].vk = instrucao.op2+"_"+contGlobal.value;
-					contGlobal.value++;
+					unidade[i].qj = registerFile.apelido[j];
+				}
+				if(registerFile.registerSolved[k] == true){
+					if(registerFile.apelido[k] == ""){
+						unidade[i].vk = instrucao.op1+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vk = registerFile.apelido[k];
+					}
 				}
 				else{
-					unidade[i].vk = registerFile.apelido[k];
+					unidade[i].qk = registerFile.apelido[k];
 				}
 			}
-			else{
-				unidade[i].qk = registerFile.apelido[k];
+			else if(instrucao.nome == "BNEZ"){
+				unidade[i].op = instrucao.nome;
+				var j = registerFile.acharPosicao(instrucao.op0);				
+				if(registerFile.registerSolved[j] == true){
+					if(registerFile.apelido[j] == ""){
+						unidade[i].vj = instrucao.op0+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vj = registerFile.apelido[j];
+					}						
+				}
+				else{
+					unidade[i].qj = registerFile.apelido[j];
+				}				
+			}
+			else{				
+				unidade[i].op = instrucao.nome;
+				var j = registerFile.acharPosicao(instrucao.op1);
+				var k = registerFile.acharPosicao(instrucao.op2);
+				if(registerFile.registerSolved[j] == true){
+					if(registerFile.apelido[j] == ""){
+						unidade[i].vj = instrucao.op1+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vj = registerFile.apelido[j];
+					}						
+				}
+				else{
+					unidade[i].qj = registerFile.apelido[j];
+				}
+				if(registerFile.registerSolved[k] == true){
+					if(registerFile.apelido[k] == ""){
+						unidade[i].vk = instrucao.op2+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vk = registerFile.apelido[k];
+					}
+				}
+				else{
+					unidade[i].qk = registerFile.apelido[k];
+				}
 			}					
 		}
 		else if(nomeUnidade == "Store"){
@@ -341,7 +367,9 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 	return false;
 }
 
-/*Função que acha qual unidade deve ir a instrucao*/
+/*Função que acha qual unidade deve ir a instrucao
+	TESTADA
+*/ 
 function acharUnidade(instrucao,reservationStation){
 	if(instrucao.nome == "ADD.D" || instrucao.nome == "SUBD" || instrucao.nome == "DADDUI"){
 		return [reservationStation.adds,"Add"];
@@ -360,6 +388,7 @@ function acharUnidade(instrucao,reservationStation){
 	}
 }
 
+//TESTADA
 function resolveuTudo(lista){
 	for(var i = 0; i < lista.length; i++){		
 		if(lista[i] != true){

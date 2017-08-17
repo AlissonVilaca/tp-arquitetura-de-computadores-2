@@ -2,18 +2,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">
-	<script src="ajax5.js"></script>
+	<!--<link type="text/css" rel="stylesheet" href="yui.css" />-->
+	<link type="text/css" rel="stylesheet" href="estilo.css" />
 	<script>
-		function init() {
+		function next() {
 			var valor = document.getElementById("numero").value;
 			window.localStorage.setItem("quantidade", valor);
 			window.location = "page2.html";
-		}		
+		}
 	</script>
 
 </head>
 <body>
+	<div id="entrada">
+	<h>Número de instruções</h>
 	<input id="numero" type="text">
-	<input type="button" id="botao" onClick="init();" value="proximo">
+	<input type="button" class="botao" onClick="next();" value="Próximo">
 </body>
 </hmtl>
