@@ -1,16 +1,18 @@
 //TESTADA
-function init(){	
-	var listaInstrucoes  = carregarDados();	
+function init(){
+	//latencia maior para n deixar o código entrar em loop caso haja um problema
+	var maiorLatencia = {value:0};
+	var listaInstrucoes  = carregarDados(maiorLatencia);	
 	var listadeFotos = [];
-	resolverTomasulo(listaInstrucoes,listadeFotos);
-
+	var limiteClock = maiorLatencia.value * (listaInstrucoes.length+1);	
+	resolverTomasulo(listaInstrucoes,listadeFotos,limiteClock);
 }
+
 //TESTADA
-function carregarDados(){
+function carregarDados(maiorLatencia){
 	var listaInstrucoes = [];
 	//criar lista de instruções Rafael, ja colocando a latencia junto com as instruções;		
-	var quantidade = parseInt(window.localStorage.getItem("quantidade"));
-	
+	var quantidade = parseInt(window.localStorage.getItem("quantidade"));	
 	for(var i = 0; i < quantidade; i++) { 
 		var nome = window.localStorage.getItem("t"+i);		
 		var op0 = window.localStorage.getItem("r"+i);
@@ -36,12 +38,18 @@ function carregarDados(){
 			l = parseInt(window.localStorage.getItem("qtdInt"));
 		}			 					 					 		
 
+		//troco a maiorLatencia
+		if(l > maiorLatencia.value){
+			maiorLatencia.value = l;
+		}
+
 		listaInstrucoes.push(new Instrucao(nome,op0,op1,op2,l));		
 	}									
 	return listaInstrucoes;
 }
 
-function resolverTomasulo(listaInstrucoes,listadeFotos){		
+//TESTADA
+function resolverTomasulo(listaInstrucoes,listadeFotos,limiteClock){		
 	//incializar dados
 	var listaInstrucoesPronta = [];	
 	var fimExecucao = [];
@@ -64,7 +72,8 @@ function resolverTomasulo(listaInstrucoes,listadeFotos){
 	listadeFotos.push(new Foto(instructionStatusCopy,reservationStationCopy,registerFileCopy,0));
 	//resolver algoritmo	
 	//milestone	
-	while(!resolveuTudo(listaInstrucoesPronta)){
+	var entrouEmLoop = false;
+	while(!resolveuTudo(listaInstrucoesPronta) && !entrouEmLoop){
 		//despachar a instrução	se existe instrucao com este pc	
 		var despachou = false;		
 		if(pc < listaInstrucoes.length){
@@ -85,11 +94,16 @@ function resolverTomasulo(listaInstrucoes,listadeFotos){
 			pc++;
 		}
 		//incrementar o clock		
-		clock++;				
+		clock++;
+		//verificar possivel loop no algoritmo
+		if(clock > limiteClock){
+			entrouEmLoop = true;
+		}
 	}
 	window.localStorage.setItem("listaFotos",JSON.stringify(listadeFotos));
 }
-//atualizar
+
+//TESTADA
 function atualizar(pc,listaInstrucao,listaInstrucoesPronta,clock,instructionStatus,reservationStation,fimExecucao,registerFile,contGlobal){
 	var auxProntos = [];
 	for(var k = 0; k < listaInstrucao.length; k++){
@@ -152,13 +166,15 @@ function atualizar(pc,listaInstrucao,listaInstrucoesPronta,clock,instructionStat
 				var posicao = registerFile.acharPosicao(instrucao.op0);
 				atualizaReservationStation(registerFile.apelido[posicao],reservationStation,contGlobal,instrucao);				
 				registerFile.apelido[posicao] = instrucao.op0+"_"+contGlobal.value;
-				contGlobal.value++;					
+				contGlobal.value++;
+				registerFile.registerSolved[posicao] = true;
 			}				
 			listaInstrucoesPronta[k] = true;
 			limparUnidade(reservationStation,instrucao);			
 		}			
 	}
 }
+
 //TESTDA
 function limparUnidade(reservationStation,instrucao){
 	var linha;
@@ -199,6 +215,7 @@ function limparUnidade(reservationStation,instrucao){
 		linha.busy = false;
 	}			
 }
+
 //TESTADA
 function atualizaReservationStation(apelido,reservationStation,contGlobal,instrucao){
 	var renomeamento = instrucao.op0+"_"+contGlobal.value;
@@ -239,6 +256,7 @@ function atualizaReservationStation(apelido,reservationStation,contGlobal,instru
 		}
 	}	
 }
+
 //TESTADA
 function despachar(pc,instrucao,clock,instructionStatus,reservationStation,registerFile,contGlobal){
 	var unidadeEnome = acharUnidade(instrucao,reservationStation);
@@ -257,15 +275,9 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 	if(linhaDisponivel){			
 		//informei qual linha da unidade se encontra a dada instrução
 		instrucao.posicaoUnidade = i;
-		var posicaoNoFU = registerFile.acharPosicao(instrucao.op0);
-		if(instrucao.nome != "S.D" && instrucao.nome != "BEQ" && instrucao.nome != "BNEZ"){
-			registerFile.registerSolved[posicaoNoFU] = false;
-			var x = i+1;
-			registerFile.apelido[posicaoNoFU] = nomeUnidade+x;
-		}				
+		var posicaoNoFU = registerFile.acharPosicao(instrucao.op0);						
 
-		//despachando para a unidade correta
-		unidade[i].busy = true;
+		//despachando para a unidade correta		
 		if(nomeUnidade == "Add" || nomeUnidade == "Mult" || nomeUnidade == "Integer"){
 			if(instrucao.nome == "BEQ"){
 				unidade[i].op = instrucao.nome;
@@ -361,6 +373,13 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 			unidade[i].address = instrucao.op1+"+"+instrucao.op2;
 		}		
 		instructionStatus.matrizStatus[pc][0] = clock;
+		unidade[i].busy = true;
+		//
+		if(instrucao.nome != "S.D" && instrucao.nome != "BEQ" && instrucao.nome != "BNEZ"){
+			registerFile.registerSolved[posicaoNoFU] = false;
+			var x = i+1;
+			registerFile.apelido[posicaoNoFU] = nomeUnidade+x;
+		}
 		return true;
 	}
 	//não teve linha na unidade disponivel para ser despachado
