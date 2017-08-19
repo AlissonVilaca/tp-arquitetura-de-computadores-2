@@ -4,7 +4,7 @@ function init(){
 	var maiorLatencia = {value:0};
 	var listaInstrucoes  = carregarDados(maiorLatencia);	
 	var listadeFotos = [];
-	var limiteClock = maiorLatencia.value * (listaInstrucoes.length+1);	
+	var limiteClock = maiorLatencia.value * (listaInstrucoes.length+1) + 2 * (listaInstrucoes.length);	
 	resolverTomasulo(listaInstrucoes,listadeFotos,limiteClock);
 }
 
@@ -19,7 +19,7 @@ function carregarDados(maiorLatencia){
 		var op1 = window.localStorage.getItem("s"+i);
 		var op2 = window.localStorage.getItem("d"+i);
 		var l = 0;
-		if(nome == "ADD.D" || nome == "SUBD" || nome == "DADDUI"){
+		if(nome == "ADD.D" || nome == "SUBD" /*|| nome == "DADDUI"*/){
 			l = parseInt(window.localStorage.getItem("qtdAdd"));
 		}
 		else if(nome == "MULTD"){
@@ -180,7 +180,7 @@ function limparUnidade(reservationStation,instrucao){
 	var linha;
 	var achou = false;
 	//reseta linha model 1
-	if(instrucao.nome == "ADD.D" || instrucao.nome == "SUBD" || instrucao.nome == "DADDUI"){
+	if(instrucao.nome == "ADD.D" || instrucao.nome == "SUBD"){
 		linha = reservationStation.adds[instrucao.posicaoUnidade];							
 		achou = true;
 	}
@@ -188,7 +188,7 @@ function limparUnidade(reservationStation,instrucao){
 		linha = reservationStation.mult[instrucao.posicaoUnidade];							
 		achou = true;
 	}
-	else if(instrucao.nome == "ADD" || instrucao.nome == "BEQ" || instrucao.nome == "BNEZ"){
+	else if(instrucao.nome == "ADD" || instrucao.nome == "BEQ" || instrucao.nome == "BNEZ" || instrucao.nome == "DADDUI"){
 		linha = reservationStation.integer[instrucao.posicaoUnidade];							
 		achou = true;
 	}
@@ -390,7 +390,7 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 	TESTADA
 */ 
 function acharUnidade(instrucao,reservationStation){
-	if(instrucao.nome == "ADD.D" || instrucao.nome == "SUBD" || instrucao.nome == "DADDUI"){
+	if(instrucao.nome == "ADD.D" || instrucao.nome == "SUBD" /*|| instrucao.nome == "DADDUI"*/){
 		return [reservationStation.adds,"Add"];
 	}
 	else if(instrucao.nome == "MULTD" || instrucao.nome == "DIV.D"){
