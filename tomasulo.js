@@ -324,6 +324,24 @@ function despachar(pc,instrucao,clock,instructionStatus,reservationStation,regis
 					unidade[i].qj = registerFile.apelido[j];
 				}				
 			}
+			//DADDUI QUE NÃO É FP E TEM SOMENTE UM REG OPERANDO
+			else if(instrucao.nome == "DADDUI"){
+				unidade[i].op = instrucao.nome;
+				var j = registerFile.acharPosicao(instrucao.op1);				
+				if(registerFile.registerSolved[j] == true){
+					if(registerFile.apelido[j] == ""){
+						unidade[i].vj = instrucao.op1+"_"+contGlobal.value;
+						contGlobal.value++;
+					}
+					else{
+						unidade[i].vj = registerFile.apelido[j];
+					}						
+				}
+				else{
+					unidade[i].qj = registerFile.apelido[j];
+				}
+				unidade[i].vk = "NUMERO";
+			}
 			else{				
 				unidade[i].op = instrucao.nome;
 				var j = registerFile.acharPosicao(instrucao.op1);

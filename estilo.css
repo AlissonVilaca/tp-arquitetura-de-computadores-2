@@ -1,5 +1,5 @@
 
-body{
+body{    
  background-color: #90EE90;
  font-family: Verdana, Geneva, Arial, sans-serif;
  font-size: small;
@@ -9,7 +9,7 @@ body{
 
 #entrada{
  text-align: center;
- padding: 200px;
+ padding: 200px 200px 0px 200px;
  font-family: Verdana, Geneva, Arial, sans-serif;
  font-size: small;
  height: auto;
@@ -75,6 +75,25 @@ body{
  text-align: center;
 }
 
+#rodape{
+    position: relative;
+    text-align: center;
+    display: block;
+    float: left;
+    margin: 15% 0% 0% 0.5%;
+    padding: 1%;
+    background-color: #4CAF50;
+    color: white;
+    width: 97%;
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#title{
+    color:black;
+    text-align: center;
+    font-size: 32px;
+}
 caption{
  color: white;
  background-color: #555555;
@@ -115,3 +134,9 @@ br{
     margin: 4px 2px;
     cursor: pointer;
 }
+
+.icon{
+    width: 32px;
+    height: 32px;
+}
+

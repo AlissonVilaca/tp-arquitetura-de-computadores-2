@@ -21,9 +21,15 @@
 			window.localStorage.setItem("clock", 0);
 			document.getElementById("clockAtual").innerHTML = "0";
 			
-			init(); 
+			init();
+			inserirCreditos();
 		}
 		
+		function inserirCreditos(){
+			var out = "Feito com muito <img class=\"icon\"src=\"coffe.png\" alt=\"Coffe\"/> por Alisson Villaça, Diego Sousa, Nechelley Alves e Rafael Mancini - DCC@2017.";
+			document.getElementById("rodape").innerHTML = out;
+		}
+
 		function montaTabelas(quantidade) {
 			montaTabelaInstr(quantidade);
 			montaLantencias();
@@ -233,10 +239,8 @@
 			}
 			
 			//registerFile
-			for(i = 0;i < 32;i++){
-				if(foto.registerFile.apelido[i] != ""){
-					document.getElementById("Reg"+i).innerHTML = foto.registerFile.apelido[i];
-				}
+			for(i = 0;i < 32;i++){				
+				document.getElementById("Reg"+i).innerHTML = foto.registerFile.apelido[i];				
 			}
 		}
 		
@@ -314,6 +318,7 @@
 	<input type="button" id="prev" class="botao" onClick="antClock();" value="Ciclo Anterior">
 	<input type="button" id="prox" class="botao" onClick="proxClock();" value="Ciclo Posterior">
 	<input type="button" id="end" class="botao" onClick="fimExe();" value="Fim">
+	<div id="rodape"></div>
 </body>
 </html>
 

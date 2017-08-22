@@ -3,8 +3,14 @@
 <head>
 	<meta charset="utf-8">
 	<!--<link type="text/css" rel="stylesheet" href="yui.css" />-->
-	<link type="text/css" rel="stylesheet" href="estilo.css" />
+	<link type="text/css" rel="stylesheet" href="estilo.css" />	
 	<script>
+
+		window.onload = function(){
+			var out = "Feito com muito <img class=\"icon\"src=\"coffe.png\" alt=\"Coffe\"/> por Alisson Villaça, Diego Sousa, Nechelley Alves e Rafael Mancini - DCC@2017.";
+			document.getElementById("rodape").innerHTML = out;
+		};
+
 		function next() {
 			var valor = document.getElementById("numero").value;
 			window.localStorage.setItem("quantidade", valor);
@@ -14,9 +20,12 @@
 
 </head>
 <body>
+	<h1 id="title">Tomasulo's Solver</h1>
 	<div id="entrada">
 	<h>Número de instruções</h>
 	<input id="numero" type="text">
 	<input type="button" class="botao" onClick="next();" value="Próximo">
+	</div>
+	<div id="rodape"></div>
 </body>
 </hmtl>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -12,8 +13,14 @@
 			
 			//monta a tabela com os campos para as intrucoes e seus registradores serem selecionados
 			montarTabela(quantidade);
+			inserirCreditos();
 		}
 		
+		function inserirCreditos(){
+			var out = "Feito com muito <img class=\"icon\"src=\"coffe.png\" alt=\"Coffe\"/> por Alisson Villaça, Diego Sousa, Nechelley Alves e Rafael Mancini - DCC@2017.";
+			document.getElementById("rodape").innerHTML = out;
+		}
+
 		function montarTabela(quantidade){
 			var out = "<table id=\"instrucoes\">";
 			for(var i=0; i < quantidade; i++){
@@ -80,7 +87,12 @@
 					out0 += "<option>R"+j+"</option>";
 				}
 				out1 = out0;
-				out2 = out0;
+				if(valor == "DADDUI"){
+					out2 = "<option>NUMERO</option>";	
+				}
+				else{
+					out2 = out0;
+				}				
 			}else{
 				for(var j = 0; j < 16; j += 1) {
 					out0 += "<option>F"+(j+j)+"</option>";
@@ -149,6 +161,6 @@
 
 	</div>
 	<input class="botao" style="float:right"type="button" value="Executar Tomasulo" onClick="tomasulo();">
-
+	<div id="rodape"></div>
 </body>
 <html>
